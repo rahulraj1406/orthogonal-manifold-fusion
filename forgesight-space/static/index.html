@@ -8,21 +8,22 @@
 />
 <style>
   :root {
-    --bg: #08090c;
-    --bg2: #0d0f14;
-    --panel: rgba(20, 23, 30, 0.72);
-    --panel-border: rgba(255, 255, 255, 0.08);
-    --line: rgba(255, 255, 255, 0.09);
-    --ink: #e7e9ee;
-    --ink-dim: #8a8f9c;
-    --ink-dimmer: #565b68;
-    --cyan: #23e5c8;
-    --cyan-dim: rgba(35, 229, 200, 0.35);
-    --amber: #ffb648;
-    --red: #ff4557;
-    --red-glow: rgba(255, 69, 87, 0.45);
-    --green: #35e08a;
-    --green-glow: rgba(53, 224, 138, 0.4);
+    --bg: #0b0705;
+    --bg2: #140d09;
+    --panel: rgba(30, 20, 13, 0.72);
+    --panel-border: rgba(255, 152, 64, 0.14);
+    --line: rgba(255, 152, 64, 0.14);
+    --ink: #f6ede2;
+    --ink-dim: #b9a692;
+    --ink-dimmer: #75614f;
+    --orange: #ff7a1a;
+    --orange-bright: #ffa63d;
+    --orange-dim: rgba(255, 122, 26, 0.35);
+    --amber: #ffc857;
+    --flame: #ff3d1a;
+    --flame-glow: rgba(255, 61, 26, 0.5);
+    --quench: #2dd9c3;
+    --quench-glow: rgba(45, 217, 195, 0.42);
     --radius: 14px;
     --mono: "IBM Plex Mono", monospace;
     --sans: "IBM Plex Sans", sans-serif;
@@ -42,38 +43,62 @@
 
   body {
     background-image:
-      radial-gradient(ellipse 80% 60% at 15% -10%, rgba(35, 229, 200, 0.09), transparent),
-      radial-gradient(ellipse 60% 50% at 100% 10%, rgba(255, 69, 87, 0.06), transparent),
-      repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 3px);
+      radial-gradient(ellipse 85% 55% at 12% -12%, rgba(255, 122, 26, 0.16), transparent),
+      radial-gradient(ellipse 65% 55% at 105% 8%, rgba(255, 61, 26, 0.10), transparent),
+      radial-gradient(ellipse 55% 45% at 50% 115%, rgba(45, 217, 195, 0.06), transparent),
+      repeating-linear-gradient(0deg, rgba(255, 200, 150, 0.02) 0px, rgba(255, 200, 150, 0.02) 1px, transparent 1px, transparent 3px);
     background-attachment: fixed;
   }
 
-  ::selection { background: var(--cyan); color: #000; }
+  ::selection { background: var(--orange); color: #170b03; }
 
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-track { background: var(--bg2); }
-  ::-webkit-scrollbar-thumb { background: #2a2e38; border-radius: 8px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--cyan-dim); }
+  ::-webkit-scrollbar-thumb { background: #33241a; border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--orange-dim); }
 
   .noise {
     position: fixed; inset: 0; pointer-events: none; opacity: 0.035; z-index: 999; mix-blend-mode: overlay;
   }
 
-  .wrap { max-width: 1360px; margin: 0 auto; padding: 28px 28px 80px; }
+  /* ---------- Ember particles ---------- */
+  .embers { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+  .embers span {
+    position: absolute; bottom: -12px; width: 3px; height: 3px; border-radius: 50%;
+    background: var(--orange-bright);
+    box-shadow: 0 0 6px 2px var(--orange), 0 0 14px 5px rgba(255, 122, 26, 0.35);
+    opacity: 0; animation: emberRise linear infinite;
+  }
+  @keyframes emberRise {
+    0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+    8% { opacity: 0.9; }
+    80% { opacity: 0.5; }
+    100% { transform: translateY(-108vh) translateX(24px) scale(0.4); opacity: 0; }
+  }
+
+  .wrap { position: relative; z-index: 2; max-width: 1360px; margin: 0 auto; padding: 28px 28px 80px; }
 
   /* ---------- Header ---------- */
   header {
     display: flex; align-items: flex-end; justify-content: space-between;
-    border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 26px;
-    flex-wrap: wrap; gap: 14px;
+    padding-bottom: 18px; margin-bottom: 4px; flex-wrap: wrap; gap: 14px; position: relative;
+  }
+  .hazard-rule {
+    height: 4px; margin-bottom: 26px;
+    background: repeating-linear-gradient(-45deg, var(--orange) 0 10px, #1a120b 10px 20px);
+    opacity: 0.55; border-radius: 2px;
   }
   .brand { display: flex; align-items: center; gap: 14px; }
-  .brand svg { width: 46px; height: 46px; flex-shrink: 0; }
+  .brand svg { width: 46px; height: 46px; flex-shrink: 0; filter: drop-shadow(0 0 10px rgba(255, 122, 26, 0.35)); }
   .brand h1 {
-    font-family: var(--display); font-weight: 900; font-size: 40px; line-height: 0.85;
-    letter-spacing: 0.5px; margin: 0; color: var(--ink);
+    font-family: var(--display); font-weight: 900; font-size: 42px; line-height: 0.85;
+    letter-spacing: 0.5px; margin: 0;
   }
-  .brand h1 span { color: var(--cyan); }
+  .brand h1 .forge-word {
+    background: linear-gradient(120deg, var(--flame), var(--orange) 45%, var(--amber));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .brand h1 .sight-word { color: var(--quench); }
   .brand small {
     display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 2.5px;
     color: var(--ink-dim); margin-top: 4px; text-transform: uppercase;
@@ -83,7 +108,7 @@
     letter-spacing: 1px; line-height: 1.6;
   }
   .case-tag b { color: var(--ink-dim); }
-  .case-tag .dot { color: var(--green); }
+  .case-tag .dot { color: var(--quench); }
 
   /* ---------- Layout ---------- */
   .grid {
@@ -94,45 +119,55 @@
   .panel {
     background: var(--panel); border: 1px solid var(--panel-border); border-radius: var(--radius);
     backdrop-filter: blur(14px); padding: 20px; position: relative; overflow: hidden;
+    box-shadow: 0 20px 50px -25px rgba(0, 0, 0, 0.6);
   }
   .panel::before {
     content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--cyan-dim), transparent);
+    background: linear-gradient(90deg, transparent, var(--orange-dim), transparent);
   }
   .panel-title {
     font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
     color: var(--ink-dim); margin: 0 0 16px; display: flex; align-items: center; gap: 8px;
   }
-  .panel-title::before { content: ""; width: 6px; height: 6px; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+  .panel-title::before { content: ""; width: 6px; height: 6px; background: var(--orange); box-shadow: 0 0 8px var(--orange); border-radius: 1px; }
 
   /* ---------- Upload panel ---------- */
   #dropzone {
     border: 1.5px dashed var(--panel-border); border-radius: 10px; padding: 18px; text-align: center;
     cursor: pointer; transition: border-color 0.2s, background 0.2s; position: relative; min-height: 220px;
     display: flex; align-items: center; justify-content: center; overflow: hidden;
+    animation: idleBreathe 4s ease-in-out infinite;
   }
-  #dropzone.drag { border-color: var(--cyan); background: rgba(35, 229, 200, 0.06); }
+  @keyframes idleBreathe {
+    0%, 100% { border-color: var(--panel-border); }
+    50% { border-color: var(--orange-dim); }
+  }
+  #dropzone.drag { border-color: var(--orange); background: rgba(255, 122, 26, 0.08); animation: none; }
   #dropzone .hint { color: var(--ink-dim); font-size: 13px; line-height: 1.7; }
   #dropzone .hint b { color: var(--ink); font-family: var(--mono); }
   #previewWrap { position: relative; width: 100%; display: none; }
   #previewImg { width: 100%; display: block; border-radius: 8px; }
   .scanline {
     position: absolute; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-    box-shadow: 0 0 14px 3px var(--cyan); top: 0; display: none;
+    background: linear-gradient(90deg, transparent, var(--orange-bright), var(--flame), transparent);
+    box-shadow: 0 0 16px 4px var(--orange); top: 0; display: none;
   }
   .scanning .scanline { display: block; animation: scan 1.6s linear infinite; }
   @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
 
   #analyzeBtn {
     margin-top: 14px; width: 100%; padding: 13px; border-radius: 8px; border: none; cursor: pointer;
-    background: var(--cyan); color: #04211d; font-family: var(--mono); font-weight: 700;
-    font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; transition: transform 0.12s, box-shadow 0.2s;
+    background: linear-gradient(120deg, var(--orange), var(--amber)); color: #2a1503;
+    font-family: var(--mono); font-weight: 700;
+    font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase;
+    transition: transform 0.12s, box-shadow 0.2s; position: relative;
   }
-  #analyzeBtn:hover:not(:disabled) { box-shadow: 0 0 22px var(--cyan-dim); transform: translateY(-1px); }
-  #analyzeBtn:disabled { background: #2a2e38; color: var(--ink-dimmer); cursor: not-allowed; }
+  #analyzeBtn:hover:not(:disabled) { box-shadow: 0 0 26px var(--orange-dim); transform: translateY(-1px); }
+  #analyzeBtn:active:not(:disabled) { transform: translateY(0); }
+  #analyzeBtn:disabled { background: #2a2018; color: var(--ink-dimmer); cursor: not-allowed; }
 
   #statusText { font-family: var(--mono); font-size: 11.5px; color: var(--ink-dimmer); margin-top: 10px; min-height: 16px; letter-spacing: 0.5px; }
+  #statusText.err { color: var(--flame); }
 
   .exif-table { margin-top: 18px; display: none; }
   .exif-row { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px dashed var(--line); font-family: var(--mono); font-size: 11.5px; }
@@ -146,10 +181,10 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
   }
   #verdictCard.idle .idle-msg { color: var(--ink-dimmer); font-family: var(--mono); font-size: 13px; }
-  #verdictCard.ai { border-color: var(--red-glow); box-shadow: inset 0 0 60px rgba(255,69,87,0.08); animation: pulseRed 2.2s ease-in-out infinite; }
-  #verdictCard.real { border-color: var(--green-glow); box-shadow: inset 0 0 60px rgba(53,224,138,0.08); animation: pulseGreen 2.2s ease-in-out infinite; }
-  @keyframes pulseRed { 0%,100% { box-shadow: inset 0 0 60px rgba(255,69,87,0.08); } 50% { box-shadow: inset 0 0 90px rgba(255,69,87,0.18); } }
-  @keyframes pulseGreen { 0%,100% { box-shadow: inset 0 0 60px rgba(53,224,138,0.08); } 50% { box-shadow: inset 0 0 90px rgba(53,224,138,0.18); } }
+  #verdictCard.ai { border-color: var(--flame-glow); box-shadow: inset 0 0 60px rgba(255,61,26,0.1); animation: pulseFlame 1.8s ease-in-out infinite; }
+  #verdictCard.real { border-color: var(--quench-glow); box-shadow: inset 0 0 60px rgba(45,217,195,0.08); animation: pulseQuench 2.4s ease-in-out infinite; }
+  @keyframes pulseFlame { 0%,100% { box-shadow: inset 0 0 60px rgba(255,61,26,0.1); } 50% { box-shadow: inset 0 0 95px rgba(255,61,26,0.22); } }
+  @keyframes pulseQuench { 0%,100% { box-shadow: inset 0 0 60px rgba(45,217,195,0.08); } 50% { box-shadow: inset 0 0 90px rgba(45,217,195,0.16); } }
 
   .ring-wrap { position: relative; width: 168px; height: 168px; }
   .ring-wrap svg { transform: rotate(-90deg); width: 168px; height: 168px; }
@@ -160,8 +195,8 @@
   .ring-center .lbl { font-family: var(--mono); font-size: 9.5px; letter-spacing: 1.5px; color: var(--ink-dimmer); margin-top: 4px; }
 
   .verdict-label { font-family: var(--display); font-weight: 900; font-size: 30px; letter-spacing: 1px; margin-top: 4px; }
-  #verdictCard.ai .verdict-label { color: var(--red); text-shadow: 0 0 22px var(--red-glow); }
-  #verdictCard.real .verdict-label { color: var(--green); text-shadow: 0 0 22px var(--green-glow); }
+  #verdictCard.ai .verdict-label { color: var(--flame); text-shadow: 0 0 22px var(--flame-glow); }
+  #verdictCard.real .verdict-label { color: var(--quench); text-shadow: 0 0 22px var(--quench-glow); }
 
   .stat-row { display: flex; gap: 18px; margin-top: 8px; font-family: var(--mono); font-size: 11.5px; color: var(--ink-dim); flex-wrap: wrap; justify-content: center; }
   .stat-row b { color: var(--ink); display: block; font-size: 15px; font-family: var(--display); font-weight: 700; }
@@ -176,7 +211,6 @@
   #radarWrap { margin-top: 18px; display: none; }
   #radarSvg polygon.data { transform-origin: 150px 150px; transform: scale(0); transition: transform 0.9s cubic-bezier(.2,.8,.2,1); }
   #radarSvg.show polygon.data { transform: scale(1); }
-  .radar-legend { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: center; margin-top: 6px; font-family: var(--mono); font-size: 10px; color: var(--ink-dimmer); }
 
   /* ---------- Meters panel ---------- */
   .meter-row { margin-bottom: 16px; }
@@ -185,25 +219,31 @@
   .meter-desc { display: block; font-size: 10.5px; color: var(--ink-dimmer); margin-top: 1px; font-family: var(--sans); }
   .meter-val { font-family: var(--mono); font-size: 12px; color: var(--ink-dim); }
   .meter-track { height: 7px; border-radius: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
-  .meter-fill { height: 100%; width: 0%; border-radius: 4px; transition: width 1s cubic-bezier(.2,.8,.2,1); background: linear-gradient(90deg, var(--cyan), var(--amber)); }
-  .meter-fill.hot { background: linear-gradient(90deg, var(--amber), var(--red)); }
+  .meter-fill { height: 100%; width: 0%; border-radius: 4px; transition: width 1s cubic-bezier(.2,.8,.2,1); background: linear-gradient(90deg, var(--orange), var(--amber)); }
+  .meter-fill.hot { background: linear-gradient(90deg, var(--amber), var(--flame)); box-shadow: 0 0 10px rgba(255,61,26,0.5); }
 
   .agree-box {
     margin-top: 6px; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.03);
     border: 1px solid var(--line); font-family: var(--mono); font-size: 11px; color: var(--ink-dim);
     display: flex; justify-content: space-between;
   }
-  .agree-box b { color: var(--cyan); font-family: var(--display); font-size: 16px; }
+  .agree-box b { color: var(--orange-bright); font-family: var(--display); font-size: 16px; }
 
   /* ---------- Forensic gallery ---------- */
   .gallery-section { margin-top: 22px; }
   .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 14px; }
   @media (max-width: 900px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
-  .g-card { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 10px; overflow: hidden; opacity: 0; transform: translateY(10px); transition: opacity 0.5s, transform 0.5s; }
+  .g-card {
+    background: var(--panel); border: 1px solid var(--panel-border); border-radius: 10px; overflow: hidden;
+    opacity: 0; transform: translateY(10px); transition: opacity 0.5s, transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+  }
   .g-card.show { opacity: 1; transform: translateY(0); }
-  .g-card img { width: 100%; display: block; aspect-ratio: 1; object-fit: cover; background: #05060a; }
+  .g-card:hover { border-color: var(--orange-dim); box-shadow: 0 12px 28px -14px rgba(255, 122, 26, 0.35); transform: translateY(-3px); }
+  .g-card .g-img-wrap { overflow: hidden; }
+  .g-card img { width: 100%; display: block; aspect-ratio: 1; object-fit: cover; background: #05060a; transition: transform 0.4s ease; }
+  .g-card:hover img { transform: scale(1.06); }
   .g-card .g-cap { padding: 10px 12px; }
-  .g-card .g-cap h4 { margin: 0 0 4px; font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--cyan); text-transform: uppercase; }
+  .g-card .g-cap h4 { margin: 0 0 4px; font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--orange-bright); text-transform: uppercase; }
   .g-card .g-cap p { margin: 0; font-size: 11px; color: var(--ink-dimmer); line-height: 1.5; }
 
   footer { margin-top: 40px; text-align: center; font-family: var(--mono); font-size: 10.5px; color: var(--ink-dimmer); line-height: 1.8; }
@@ -215,17 +255,25 @@
   <rect width="100%" height="100%" filter="url(#n)"/>
 </svg>
 
+<div class="embers" id="embers"></div>
+
 <div class="wrap">
   <header>
     <div class="brand">
       <svg viewBox="0 0 48 48" fill="none">
-        <circle cx="21" cy="21" r="14" stroke="#23e5c8" stroke-width="2.5"/>
-        <path d="M21 12a9 9 0 0 1 9 9" stroke="#23e5c8" stroke-width="2" stroke-linecap="round"/>
-        <path d="M21 30a9 9 0 0 1-9-9" stroke="#ff4557" stroke-width="2" stroke-linecap="round"/>
-        <line x1="31" y1="31" x2="42" y2="42" stroke="#e7e9ee" stroke-width="3" stroke-linecap="round"/>
+        <defs>
+          <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ff3d1a"/>
+            <stop offset="100%" stop-color="#ffc857"/>
+          </linearGradient>
+        </defs>
+        <circle cx="21" cy="21" r="14" stroke="url(#lg1)" stroke-width="2.5"/>
+        <path d="M21 12a9 9 0 0 1 9 9" stroke="#ffa63d" stroke-width="2" stroke-linecap="round"/>
+        <path d="M21 30a9 9 0 0 1-9-9" stroke="#2dd9c3" stroke-width="2" stroke-linecap="round"/>
+        <line x1="31" y1="31" x2="42" y2="42" stroke="#f6ede2" stroke-width="3" stroke-linecap="round"/>
       </svg>
       <div>
-        <h1>FORGE<span>SIGHT</span></h1>
+        <h1><span class="forge-word">FORGE</span><span class="sight-word">SIGHT</span></h1>
         <small>Multi-Modal AI Image Forensics · Orthogonal Manifold Fusion</small>
       </div>
     </div>
@@ -234,6 +282,7 @@
       <span class="dot">●</span> DCU 2026 · Raj &amp; Devasani
     </div>
   </header>
+  <div class="hazard-rule"></div>
 
   <div class="grid">
     <!-- LEFT: Upload -->
@@ -242,14 +291,14 @@
       <div id="dropzone">
         <div class="hint" id="hintText">
           Drop an image here<br/>or <b>click to browse</b><br/><br/>
-          JPG · PNG · WEBP
+          JPG · PNG · WEBP · HEIC
         </div>
         <div id="previewWrap">
           <img id="previewImg" alt="preview" />
           <div class="scanline"></div>
         </div>
       </div>
-      <input type="file" id="fileInput" accept="image/*" hidden />
+      <input type="file" id="fileInput" accept="image/*,.heic,.heif" hidden />
       <button id="analyzeBtn" disabled>Analyze Image</button>
       <div id="statusText">awaiting evidence…</div>
 
@@ -291,8 +340,8 @@
             <svg id="radarSvg" viewBox="0 0 300 300" width="100%" style="max-width:280px">
               <g id="radarGrid" stroke="rgba(255,255,255,0.08)" fill="none"></g>
               <g id="radarAxes" stroke="rgba(255,255,255,0.12)"></g>
-              <polygon class="data" id="radarPoly" fill="rgba(35,229,200,0.18)" stroke="#23e5c8" stroke-width="2"/>
-              <g id="radarLabels" font-family="IBM Plex Mono" font-size="9" fill="#8a8f9c"></g>
+              <polygon class="data" id="radarPoly" fill="rgba(255,122,26,0.2)" stroke="#ff7a1a" stroke-width="2"/>
+              <g id="radarLabels" font-family="IBM Plex Mono" font-size="9" fill="#b9a692"></g>
             </svg>
           </div>
         </div>
@@ -323,6 +372,25 @@
 </div>
 
 <script>
+  // ---------- Ember particle background ----------
+  (function spawnEmbers() {
+    const el = document.getElementById("embers");
+    const n = 16;
+    for (let i = 0; i < n; i++) {
+      const s = document.createElement("span");
+      const left = Math.random() * 100;
+      const dur = 7 + Math.random() * 8;
+      const delay = Math.random() * 12;
+      const size = 2 + Math.random() * 2.5;
+      s.style.left = left + "%";
+      s.style.width = size + "px";
+      s.style.height = size + "px";
+      s.style.animationDuration = dur + "s";
+      s.style.animationDelay = "-" + delay + "s";
+      el.appendChild(s);
+    }
+  })();
+
   const META = {
     dino:    { name: "DINOv2-Base",  desc: "Self-supervised ViT @ 518px — structural & texture branch" },
     siglip:  { name: "SigLIP-So400m",desc: "Sigmoid contrastive ViT @ 224px — semantic branch" },
@@ -373,13 +441,38 @@
 
   function handleFile(file) {
     currentFile = file;
-    const url = URL.createObjectURL(file);
-    previewImg.src = url;
     hintText.style.display = "none";
     previewWrap.style.display = "block";
     analyzeBtn.disabled = false;
+    statusText.classList.remove("err");
     statusText.textContent = "evidence loaded — ready to analyze";
     resetResults();
+
+    // HEIC/HEIF previews aren't renderable by <img> in most browsers; the
+    // backend can still decode them fine, so just skip the local preview.
+    const isHeic = /\.(heic|heif)$/i.test(file.name) || /heic|heif/i.test(file.type);
+    if (isHeic) {
+      previewImg.removeAttribute("src");
+      previewWrap.style.background = "rgba(255,122,26,0.06)";
+      previewWrap.style.minHeight = "140px";
+      previewWrap.style.display = "flex";
+      previewWrap.style.alignItems = "center";
+      previewWrap.style.justifyContent = "center";
+      previewWrap.dataset.heic = "1";
+      if (!document.getElementById("heicNote")) {
+        const note = document.createElement("div");
+        note.id = "heicNote";
+        note.style.cssText = "font-family:var(--mono);font-size:11px;color:var(--ink-dim);text-align:center;padding:12px;";
+        note.textContent = "HEIC photo loaded (no browser preview) — ready to analyze";
+        previewWrap.appendChild(note);
+      }
+    } else {
+      delete previewWrap.dataset.heic;
+      const old = document.getElementById("heicNote");
+      if (old) old.remove();
+      previewWrap.style.background = "";
+      previewImg.src = URL.createObjectURL(file);
+    }
   }
 
   function resetResults() {
@@ -394,18 +487,24 @@
     if (!currentFile) return;
     analyzeBtn.disabled = true;
     dropzone.classList.add("scanning");
+    statusText.classList.remove("err");
     statusText.textContent = "extracting deep + forensic features…";
 
     const fd = new FormData();
     fd.append("file", currentFile);
     try {
       const res = await fetch("/predict", { method: "POST", body: fd });
-      if (!res.ok) throw new Error("server error " + res.status);
-      const data = await res.json();
+      let data;
+      try { data = await res.json(); } catch { data = null; }
+      if (!res.ok) {
+        const msg = (data && data.error) ? data.error : `server error ${res.status}`;
+        throw new Error(msg);
+      }
       renderResult(data);
       statusText.textContent = `done in ${data.elapsed_sec}s`;
     } catch (err) {
-      statusText.textContent = "error: " + err.message;
+      statusText.classList.add("err");
+      statusText.textContent = err.message;
     } finally {
       dropzone.classList.remove("scanning");
       analyzeBtn.disabled = false;
@@ -424,10 +523,10 @@
     const ring = document.getElementById("ringFg");
     const circumference = 465;
     const offset = circumference * (1 - data.confidence / 100);
-    ring.style.stroke = isAI ? "var(--red)" : "var(--green)";
+    ring.style.stroke = isAI ? "var(--flame)" : "var(--quench)";
     requestAnimationFrame(() => { ring.style.strokeDashoffset = offset; });
     document.getElementById("confPct").textContent = data.confidence.toFixed(1) + "%";
-    document.getElementById("confPct").style.color = isAI ? "var(--red)" : "var(--green)";
+    document.getElementById("confPct").style.color = isAI ? "var(--flame)" : "var(--quench)";
 
     document.getElementById("finalScore").textContent = data.final_score.toFixed(3);
     document.getElementById("agreeStat").textContent = data.agreement_pct.toFixed(0) + "%";
@@ -465,7 +564,7 @@
       const meta = GALLERY_META[key] || { title: key, cap: "" };
       const card = document.createElement("div");
       card.className = "g-card";
-      card.innerHTML = `<img src="data:image/png;base64,${b64}" alt="${meta.title}"/>
+      card.innerHTML = `<div class="g-img-wrap"><img src="data:image/png;base64,${b64}" alt="${meta.title}"/></div>
         <div class="g-cap"><h4>${meta.title}</h4><p>${meta.cap}</p></div>`;
       grid.appendChild(card);
       setTimeout(() => card.classList.add("show"), 80 * i);

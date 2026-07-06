@@ -22,6 +22,9 @@ from PIL import Image, ExifTags
 from scipy.fft import fft2, fftshift
 from scipy.stats import kurtosis
 import pywt
+import pillow_heif
+
+pillow_heif.register_heif_opener()  # lets PIL decode HEIC/HEIF (default iPhone photo format)
 
 import matplotlib
 matplotlib.use("Agg")
@@ -307,26 +310,40 @@ def health():
 async def predict(file: UploadFile = File(...)):
     t0 = time.time()
     raw = await file.read()
-    pil_img = Image.open(io.BytesIO(raw))
-    pil_img.load()
-    exif = read_exif(pil_img)
 
-    pil_rgb = pil_img.convert("RGB")
-    pil256 = pil_rgb.resize((256, 256), Image.LANCZOS)
+    try:
+        pil_img = Image.open(io.BytesIO(raw))
+        pil_img.load()
+    except Exception:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "Could not read this file as an image. Please upload a JPG, PNG, WEBP, or HEIC photo."},
+        )
 
-    with torch.no_grad():
-        dino_logit = _MODELS["dino"](to_tensor(pil_rgb, 518, DINO_MEAN, DINO_STD))
-        sig_logit = _MODELS["siglip"](to_tensor(pil_rgb, 224, SIGLIP_MEAN, SIGLIP_STD))
-        clip_logit = _MODELS["clip"](to_tensor(pil_rgb, 224, CLIP_MEAN, CLIP_STD))
+    try:
+        exif = read_exif(pil_img)
+        pil_rgb = pil_img.convert("RGB")
+        pil256 = pil_rgb.resize((256, 256), Image.LANCZOS)
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"error": f"Failed to process image: {e}"})
 
-    dino_score = sigmoid(float(dino_logit.item()))
-    sig_score = sigmoid(float(sig_logit.item()))
-    clip_score = sigmoid(float(clip_logit.item()))
+    try:
+        with torch.no_grad():
+            dino_logit = _MODELS["dino"](to_tensor(pil_rgb, 518, DINO_MEAN, DINO_STD))
+            sig_logit = _MODELS["siglip"](to_tensor(pil_rgb, 224, SIGLIP_MEAN, SIGLIP_STD))
+            clip_logit = _MODELS["clip"](to_tensor(pil_rgb, 224, CLIP_MEAN, CLIP_STD))
 
-    ela_score, ela_img = ela_branch(pil256)
-    fft_score, fft_img = fft_branch(pil256)
-    wav_score, wav_img = wavelet_branch(pil256)
-    saliency_img = dino_saliency(pil_rgb)
+        dino_score = sigmoid(float(dino_logit.item()))
+        sig_score = sigmoid(float(sig_logit.item()))
+        clip_score = sigmoid(float(clip_logit.item()))
+
+        ela_score, ela_img = ela_branch(pil256)
+        fft_score, fft_img = fft_branch(pil256)
+        wav_score, wav_img = wavelet_branch(pil256)
+        saliency_img = dino_saliency(pil_rgb)
+    except Exception as e:
+        print(f"predict() failed: {e}", flush=True)
+        return JSONResponse(status_code=500, content={"error": f"Analysis failed: {e}"})
 
     dl_score = (DL_WEIGHTS["dino"] * dino_score + DL_WEIGHTS["siglip"] * sig_score
                 + DL_WEIGHTS["clip"] * clip_score)
