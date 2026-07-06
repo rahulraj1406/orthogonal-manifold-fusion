@@ -86,7 +86,7 @@ class DINOv2FT(nn.Module):
 
 
 class CLIPFT(nn.Module):
-    def __init__(self, vis, d=768):
+    def __init__(self, vis, d=1024):
         super().__init__()
         self.visual = vis
         self.head = nn.Sequential(
@@ -131,7 +131,9 @@ def load_models():
     print("Loading CLIP ViT-L/14...", flush=True)
     import clip as openai_clip
     clip_model, _ = openai_clip.load("ViT-L/14", device="cpu")
-    clip_ft = CLIPFT(clip_model.float().visual)
+    clip_visual = clip_model.float().visual
+    clip_visual.proj = None  # use 1024-dim pre-projection pooled features, matching the trained head
+    clip_ft = CLIPFT(clip_visual)
     clip_ft.load_state_dict(torch.load(_download("clip_fold_0.pt"), map_location="cpu"))
     clip_ft.eval()
     _MODELS["clip"] = clip_ft
