@@ -108,12 +108,21 @@ def _download(filename):
     return hf_hub_download(repo_id=WEIGHTS_REPO, filename=filename, token=HF_TOKEN)
 
 
+def _load_sd(model, path):
+    sd = torch.load(path, map_location="cpu")
+    missing, unexpected = model.load_state_dict(sd, strict=False)
+    if missing:
+        print(f"  (missing keys: {missing})", flush=True)
+    if unexpected:
+        print(f"  (ignored unexpected keys: {unexpected})", flush=True)
+
+
 def load_models():
     print("Loading DINOv2-Base...", flush=True)
     import timm
     dino_bb = timm.create_model("vit_base_patch14_dinov2", pretrained=True, num_classes=0)
     dino = DINOv2FT(dino_bb)
-    dino.load_state_dict(torch.load(_download("dino_fold_0.pt"), map_location="cpu"))
+    _load_sd(dino, _download("dino_fold_0.pt"))
     dino.eval()
     _MODELS["dino"] = dino
     print("DINOv2-Base ready.", flush=True)
@@ -123,7 +132,7 @@ def load_models():
     sig_base = SiglipModel.from_pretrained("google/siglip-so400m-patch14-224")
     sig = SigLIPFT(sig_base.vision_model)
     del sig_base
-    sig.load_state_dict(torch.load(_download("sig_fold_0.pt"), map_location="cpu"))
+    _load_sd(sig, _download("sig_fold_0.pt"))
     sig.eval()
     _MODELS["siglip"] = sig
     print("SigLIP-So400m ready.", flush=True)
@@ -134,7 +143,7 @@ def load_models():
     clip_visual = clip_model.float().visual
     clip_visual.proj = None  # use 1024-dim pre-projection pooled features, matching the trained head
     clip_ft = CLIPFT(clip_visual)
-    clip_ft.load_state_dict(torch.load(_download("clip_fold_0.pt"), map_location="cpu"))
+    _load_sd(clip_ft, _download("clip_fold_0.pt"))
     clip_ft.eval()
     _MODELS["clip"] = clip_ft
     print("CLIP ViT-L/14 ready.", flush=True)
